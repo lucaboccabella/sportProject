@@ -5,4 +5,7 @@ public class Test {
 	public String getTest(){
 		return test;
 	}
+	public void setTest(String s){
+		test = s;
+	}
 }
