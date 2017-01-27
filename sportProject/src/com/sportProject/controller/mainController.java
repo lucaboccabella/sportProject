@@ -16,6 +16,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sportProject.model.Position;
+import com.sportProject.model.Risultati;
 
 @Controller
 public class mainController {
@@ -57,6 +58,23 @@ public class mainController {
 			classifica.add(pos);
 		}
 		model.addAttribute("classifica",classifica);
+		
+		/*RECUPERO RISULTATI ULTIMA GIORNATA(da integrare meglio scelta giornata)*/
+		int giornata = squadre.getJSONObject(10).getJSONObject("overall").getInt("matches_played");
+		JSONObject risultatiGiornata = Unirest.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-"+giornata+"/matches")
+				.asJson().getBody().getObject().getJSONObject("data");
+		List<Risultati> ultimiRisultati = new ArrayList<Risultati>();
+		JSONArray results = risultatiGiornata.getJSONArray("matches");
+		for(int j=0;j<results.length();j++){
+			Risultati r = new Risultati();
+			JSONObject partita = results.getJSONObject(j);
+			r.setHome(partita.getJSONObject("home").getString("team"));
+			r.setHomeres(partita.getJSONObject("home").getInt("goals"));
+			r.setAway(partita.getJSONObject("away").getString("team"));
+			r.setAwayres(partita.getJSONObject("away").getInt("goals"));
+			ultimiRisultati.add(r);
+		}
+		model.addAttribute("risultati",ultimiRisultati);
 		return "index";
 	}
 }
