@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -11,7 +12,20 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<style type="text/css">@import url("<c:url value="/css/main.css"/>");
+<style>
+	.stemmi{
+		width: 30px;
+		margin-right: 2%;
+		margin-left: 2%;
+	}
+	#footer{
+		background-color: #333;
+		color: #fff;
+	}
+	#copyright{
+		padding: 1%;
+    	margin-bottom: 0;
+	}
 </style>
 </head>
 <body>
@@ -35,7 +49,7 @@
 							<li><a href="#">Page 1-2</a></li>
 							<li><a href="#">Page 1-3</a></li>
 						</ul></li>
-					<li><a href="#">Page 2</a></li>
+					<li><a href="pronostici">Pronostici</a></li>
 					<li><a href="#">Page 3</a></li>
 				</ul>
 			</div>
@@ -61,10 +75,10 @@
 			<table class="table table-bordered col col-md-12">
 				<c:forEach var="risultato" items="${risultati}">
 					<tr class="active">
-						<td>${risultato.home}</td>
+						<td><img class="stemmi" src="http://soccer.sportsopendata.net/logos/italy/<c:url value="${fn:toLowerCase(risultato.home)}"/>.png"/>${risultato.home}</td>
 						<td class="text-center">${risultato.homeres}</td>
 						<td class="text-center">${risultato.awayres}</td>
-						<td>${risultato.away}</td>
+						<td class="text-right">${risultato.away}<img class="stemmi" src="http://soccer.sportsopendata.net/logos/italy/<c:url value="${fn:toLowerCase(risultato.away)}"/>.png"/></td>
 					</tr>
 				</c:forEach>
 			</table>
@@ -77,7 +91,7 @@
 		</div>
 	</div>
 	<div id="footer">
-		<h4>Copyright 2017</h4>
+		<h4 id="copyright">Copyright 2017</h4>
 	</div>
 </body>
 </html>
