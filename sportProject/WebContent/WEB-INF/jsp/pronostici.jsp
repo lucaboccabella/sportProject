@@ -2,4 +2,5 @@
 <c:forEach var="squadra" items="${stats}">
 	Squadra: ${squadra.key} 
 	Stats:${squadra.value.media}
+	<br />
 </c:forEach>

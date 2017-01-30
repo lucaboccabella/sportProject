@@ -1,8 +1,8 @@
 package com.sportProject.model;
 
 public class Statistica {
-	private Double TSR;
-	private Double STR;
+	private Double TSR = 0.0;
+	private Double STR = 0.0;
 	public Double getSTR() {
 		return STR;
 	}
