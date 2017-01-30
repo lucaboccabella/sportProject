@@ -1,6 +1,23 @@
 package com.sportProject.model;
 
 public class Statistica {
+	private String nomeSquadra = "";
+	public String getNomeSquadra() {
+		return nomeSquadra;
+	}
+
+	public void setNomeSquadra(String nomeSquadra) {
+		this.nomeSquadra = nomeSquadra;
+	}
+
+	public void setTSR(Double tSR) {
+		TSR = tSR;
+	}
+
+	public void setSTR(Double sTR) {
+		STR = sTR;
+	}
+
 	private Double TSR = 0.0;
 	private Double STR = 0.0;
 	public Double getSTR() {
@@ -18,7 +35,7 @@ public class Statistica {
 	}
 
 	public void setMedia() {
-		this.media = this.STR+this.getTSR()/2;
+		this.media = this.STR+this.TSR/2;
 	}
 
 	public Statistica() {}

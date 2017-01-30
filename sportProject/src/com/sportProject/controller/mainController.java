@@ -101,18 +101,7 @@ public class mainController {
 		giornata = Unirest.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/standings").asJson()
 				.getBody().getObject().getJSONObject("data").getJSONArray("standings").getJSONObject(10)
 				.getJSONObject("overall").getInt("matches_played");
-		HashMap<String, Statistica> stats = new HashMap<String, Statistica>();
-		List<String> listaSquadre = new ArrayList<String>();
-		JSONArray arraySquadre = Unirest
-				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/standings").asJson().getBody()
-				.getObject().getJSONObject("data").getJSONArray("standings");
-		for (int i = 0; i < arraySquadre.length(); i++) {
-			JSONObject squadra = arraySquadre.getJSONObject(i);
-			listaSquadre.add(squadra.getString("team"));
-		}
-		for (String s : listaSquadre) {
-			stats.put(s, new Statistica());
-		}
+		List<Statistica> stats = new ArrayList<Statistica>();
 		for (int i = 1; i <= giornata; i++) {
 			JSONArray matches = Unirest.get(
 					"http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-" + i + "/matches")
@@ -121,88 +110,141 @@ public class mainController {
 				JSONObject partita = matches.getJSONObject(j);
 				String squadraHome = partita.getJSONObject("home").getString("team");
 				String squadraAway = partita.getJSONObject("away").getString("team");
-				logger.info("Casa: " + squadraHome + " Trasferta: " + squadraAway);
 				int tiriHome = partita.getJSONObject("home").getInt("shots_on_goal")
 						+ partita.getJSONObject("home").getInt("shots_off_goal");
 				int tiriAway = partita.getJSONObject("away").getInt("shots_on_goal")
 						+ partita.getJSONObject("away").getInt("shots_off_goal");
-				logger.info("Tiri Casa: " + tiriHome + " Tiri Trasferta: " + tiriAway);
 				Statistica s = new Statistica();
-				Double TSR;
-				Double STR;
-				if (tiriHome != 0 && tiriAway != 0) {
-					TSR = stats.get(squadraHome).getTSR() + (double) (tiriHome / tiriHome + tiriAway);
-				} else {
-					TSR = stats.get(squadraHome).getTSR();
+				Statistica s2 = new Statistica();
+				Double TSR = 0.0;
+				Double STR = 0.0;
+				if(arrayListIndexByName(squadraHome,stats)!=-1){
+					if (tiriHome != 0 && tiriAway != 0) {
+						TSR = stats.get(arrayListIndexByName(squadraHome,stats)).getTSR() + (double) (tiriHome / tiriHome + tiriAway);
+				
+					} else {
+						TSR = stats.get(arrayListIndexByName(squadraHome,stats)).getTSR();
+					}
+					s.setTSR(TSR);
 				}
-				s.setTSR(TSR);
-				if (partita.getJSONObject("home").getInt("shots_on_goal") != 0
-						&& partita.getJSONObject("away").getInt("shots_on_goal") != 0) {
-					STR = stats.get(squadraHome).getSTR()
-							+ (double) partita.getJSONObject("home").getInt("shots_on_goal")
-									/ (partita.getJSONObject("home").getInt("shots_on_goal")
-											+ partita.getJSONObject("away").getInt("shots_on_goal"));
-				} else {
-					STR = stats.get(squadraHome).getSTR();
+				else{
+					if (tiriHome != 0 && tiriAway != 0) {
+						TSR = (double) (tiriHome / tiriHome + tiriAway);
+				
+					} else {
+						TSR = 0.0;
+					}
+					s.setNomeSquadra(squadraHome);
+					s.setTSR(TSR);
+					stats.add(s);
 				}
-				s.setSTR(STR);
-				s.setMedia();
-				stats.remove(squadraHome);
-				stats.put(squadraHome, s);
+				if(arrayListIndexByName(squadraHome,stats)!=-1){
+					if (partita.getJSONObject("home").getInt("shots_on_goal") != 0
+							&& partita.getJSONObject("away").getInt("shots_on_goal") != 0) {
+						STR = stats.get(arrayListIndexByName(squadraHome,stats)).getSTR()
+								+ (double) partita.getJSONObject("home").getInt("shots_on_goal")
+										/ (partita.getJSONObject("home").getInt("shots_on_goal")
+												+ partita.getJSONObject("away").getInt("shots_on_goal"));
+					} else {
+						STR = stats.get(arrayListIndexByName(squadraHome,stats)).getSTR();
+					}
+					s.setSTR(STR);
+				}
+				else{
+					if (partita.getJSONObject("home").getInt("shots_on_goal") != 0
+							&& partita.getJSONObject("away").getInt("shots_on_goal") != 0) {
+						STR = (double) partita.getJSONObject("home").getInt("shots_on_goal")
+						/ (partita.getJSONObject("home").getInt("shots_on_goal")
+								+ partita.getJSONObject("away").getInt("shots_on_goal"));
+				
+					} else {
+						STR = 0.0;
+					}
+					s.setNomeSquadra(squadraHome);
+					s.setSTR(STR);
+					stats.add(s);
+				}
 
-				if (tiriHome != 0 && tiriAway != 0) {
-					TSR = stats.get(squadraAway).getTSR() + (double) (tiriAway / tiriAway + tiriHome);
-				} else {
-					TSR = stats.get(squadraAway).getTSR();
+				/**/
+				
+				if(arrayListIndexByName(squadraAway,stats)!=-1){
+					if (tiriHome != 0 && tiriAway != 0) {
+						TSR = stats.get(arrayListIndexByName(squadraAway,stats)).getTSR() + (double) (tiriAway / tiriHome + tiriAway);
+				
+					} else {
+						TSR = stats.get(arrayListIndexByName(squadraAway,stats)).getTSR();
+					}
+					s2.setTSR(TSR);
 				}
-				s.setTSR(TSR);
-				if (partita.getJSONObject("away").getInt("shots_on_goal") != 0
-						&& partita.getJSONObject("home").getInt("shots_on_goal") != 0) {
-					STR = stats.get(squadraAway).getSTR()
-							+ (double) partita.getJSONObject("away").getInt("shots_on_goal")
-									/ (partita.getJSONObject("away").getInt("shots_on_goal")
-											+ partita.getJSONObject("home").getInt("shots_on_goal"));
-				} else {
-					STR = stats.get(squadraAway).getSTR();
+				else{
+					if (tiriHome != 0 && tiriAway != 0) {
+						TSR = (double) (tiriAway / tiriHome + tiriAway);
+				
+					} else {
+						TSR = 0.0;
+					}
+					s2.setNomeSquadra(squadraAway);
+					s2.setTSR(TSR);
+					stats.add(s2);
 				}
-				s.setMedia();
-				stats.remove(squadraAway);
-				stats.put(squadraAway, s);
-
+				if(arrayListIndexByName(squadraAway,stats)!=-1){
+					if (partita.getJSONObject("away").getInt("shots_on_goal") != 0
+							&& partita.getJSONObject("home").getInt("shots_on_goal") != 0) {
+						STR = stats.get(arrayListIndexByName(squadraAway,stats)).getSTR()
+								+ (double) partita.getJSONObject("away").getInt("shots_on_goal")
+										/ (partita.getJSONObject("home").getInt("shots_on_goal")
+												+ partita.getJSONObject("away").getInt("shots_on_goal"));
+					} else {
+						STR = stats.get(arrayListIndexByName(squadraAway,stats)).getSTR();
+					}
+					s2.setSTR(STR);
+				}
+				else{
+					if (partita.getJSONObject("home").getInt("shots_on_goal") != 0
+							&& partita.getJSONObject("away").getInt("shots_on_goal") != 0) {
+						STR = (double) partita.getJSONObject("away").getInt("shots_on_goal")
+						/ (partita.getJSONObject("home").getInt("shots_on_goal")
+								+ partita.getJSONObject("away").getInt("shots_on_goal"));
+				
+					} else {
+						STR = 0.0;
+					}
+					s2.setNomeSquadra(squadraHome);
+					s2.setSTR(STR);
+					stats.add(s2);
+				}
 			}
 		}
-		for (Statistica value : stats.values()) {
-			value.setTSR(value.getTSR() / giornata);
-			value.setSTR(value.getSTR() / giornata);
-			value.setMedia();
+		for(Statistica st : stats){
+			st.setSTR(st.getSTR()/giornata);
+			st.setTSR(st.getTSR()/giornata);
+			st.setMedia();
 		}
-		LinkedHashMap<String,Statistica> statsSorted = sortMapByValues(stats);
-		model.addAttribute("stats", statsSorted);
+		
+		Collections.sort(stats, new Comparator<Statistica>() {
+		    @Override
+		    public int compare(Statistica o1, Statistica o2) {
+		        if(o1.getMedia()>o2.getMedia()){
+		        	return -1;
+		        }
+		        else if(o1.getMedia()<o2.getMedia()){
+		        	return 1;
+		        }
+		        else{
+		        	return 0;
+		        }
+		    }
+		});
+		model.addAttribute("stats", stats);
 		return "pronostici";
 	}
 	
-	public static LinkedHashMap<String,Statistica> sortMapByValues(HashMap<String,Statistica> hm){
-		Set<Entry<String,Statistica>> mapEntries = hm.entrySet();
-		List<Entry<String,Statistica>> aList = new LinkedList<Entry<String,Statistica>>(mapEntries);
-		Collections.sort(aList, new Comparator<Entry<String,Statistica>>() {
-            @Override
-            public int compare(Entry<String, Statistica> ele1,
-                    Entry<String, Statistica> ele2) {
-                if(ele1.getValue().getMedia()>ele2.getValue().getMedia()){
-                	return -1;
-                }
-                else if(ele1.getValue().getMedia()<ele2.getValue().getMedia()){
-                	return 1;
-                }
-                else{
-                	return 0;
-                }
-            }
-        });
-		LinkedHashMap<String,Statistica> aMap2 = new LinkedHashMap<String, Statistica>();
-	    for(Entry<String,Statistica> entry: aList) {
-	    	aMap2.put(entry.getKey(), entry.getValue());
-	    }
-		return aMap2;
+	public static int arrayListIndexByName(String name,List<Statistica> array){
+		for(int i=0;i<array.size();i++){
+			if(name.equals(array.get(i).getNomeSquadra())){
+				return i;
+			}
+		}
+		return -1;
 	}
 }
