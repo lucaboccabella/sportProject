@@ -1,54 +1,80 @@
 package com.sportProject.model;
 
 public class Statistica {
-	private String nomeSquadra = "";
-	public String getNomeSquadra() {
-		return nomeSquadra;
+	private int goalFattiCasa;
+	private int goalSubitiCasa;
+	private int goalFattiTrasferta;
+	private int goalSubitiTrasferta;
+	private int partiteGiocateCasa;
+	private int partiteGiocateTrasferta;
+	private String nomeCasa;
+	private String nomeTrasferta;
+	
+	public Statistica() {
 	}
 
-	public void setNomeSquadra(String nomeSquadra) {
-		this.nomeSquadra = nomeSquadra;
+	public int getGoalFattiCasa() {
+		return goalFattiCasa;
 	}
 
-	public void setTSR(Double tSR) {
-		TSR = tSR;
+	public void setGoalFattiCasa(int goalFattiCasa) {
+		this.goalFattiCasa = goalFattiCasa;
 	}
 
-	public void setSTR(Double sTR) {
-		STR = sTR;
+	public int getGoalSubitiCasa() {
+		return goalSubitiCasa;
 	}
 
-	private Double TSR = 0.0;
-	private Double STR = 0.0;
-	public Double getSTR() {
-		return STR;
+	public void setGoalSubitiCasa(int goalSubitiCasa) {
+		this.goalSubitiCasa = goalSubitiCasa;
 	}
 
-	public void setSTR(double sTR) {
-		STR = sTR;
+	public int getGoalFattiTrasferta() {
+		return goalFattiTrasferta;
 	}
 
-	private double media = 0;
-
-	public double getMedia() {
-		return media;
+	public void setGoalFattiTrasferta(int goalFattiTrasferta) {
+		this.goalFattiTrasferta = goalFattiTrasferta;
 	}
 
-	public void setMedia() {
-		this.media = this.STR+this.TSR/2;
+	public int getGoalSubitiTrasferta() {
+		return goalSubitiTrasferta;
 	}
 
-	public Statistica() {}
-
-	public Double getTSR() {
-		return TSR;
+	public void setGoalSubitiTrasferta(int goalSubitiTrasferta) {
+		this.goalSubitiTrasferta = goalSubitiTrasferta;
 	}
 
-	public void setTSR(double TSR) {
-		this.TSR = TSR;
+	public int getPartiteGiocateCasa() {
+		return partiteGiocateCasa;
+	}
+
+	public void setPartiteGiocateCasa(int partiteGiocateCasa) {
+		this.partiteGiocateCasa = partiteGiocateCasa;
+	}
+
+	public int getPartiteGiocateTrasferta() {
+		return partiteGiocateTrasferta;
+	}
+
+	public void setPartiteGiocateTrasferta(int partiteGiocateTrasferta) {
+		this.partiteGiocateTrasferta = partiteGiocateTrasferta;
+	}
+
+	public String getNomeCasa() {
+		return nomeCasa;
+	}
+
+	public void setNomeCasa(String nomeCasa) {
+		this.nomeCasa = nomeCasa;
+	}
+
+	public String getNomeTrasferta() {
+		return nomeTrasferta;
+	}
+
+	public void setNomeTrasferta(String nomeTrasferta) {
+		this.nomeTrasferta = nomeTrasferta;
 	}
 	
-	public void setMedia(double media){
-		this.media = media;
-	}
 }

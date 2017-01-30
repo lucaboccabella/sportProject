@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:forEach var="squadra" items="${stats}">
-	Squadra: ${squadra.nomeSquadra} 
-	Stats:${squadra.media}
+<c:forEach var="risultati" items="${stats}">
+	<c:forEach var="risultato" items="${risulati}">
+		${risultato}
+	</c:forEach>
 	<br />
 </c:forEach>

@@ -95,156 +95,67 @@ public class mainController {
 	@RequestMapping(value = "/pronostici")
 	public String pronostici(Model model) throws UnirestException {
 		/*
-		 * RECUPERO STATISTICHE E LI SALVO IN UNA MAPPA CON CHIAVE IL NOME E
-		 * VALORI LA LISTA DI STATISTICHE
+		 * RECUPERO STATISTICHE 
 		 */
-		giornata = Unirest.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/standings").asJson()
-				.getBody().getObject().getJSONObject("data").getJSONArray("standings").getJSONObject(10)
-				.getJSONObject("overall").getInt("matches_played");
-		List<Statistica> stats = new ArrayList<Statistica>();
-		for (int i = 1; i <= giornata; i++) {
-			JSONArray matches = Unirest.get(
-					"http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-" + i + "/matches")
-					.asJson().getBody().getObject().getJSONObject("data").getJSONArray("matches");
-			for (int j = 0; j < matches.length(); j++) {
-				JSONObject partita = matches.getJSONObject(j);
-				String squadraHome = partita.getJSONObject("home").getString("team");
-				String squadraAway = partita.getJSONObject("away").getString("team");
-				int tiriHome = partita.getJSONObject("home").getInt("shots_on_goal")
-						+ partita.getJSONObject("home").getInt("shots_off_goal");
-				int tiriAway = partita.getJSONObject("away").getInt("shots_on_goal")
-						+ partita.getJSONObject("away").getInt("shots_off_goal");
-				Statistica s = new Statistica();
-				Statistica s2 = new Statistica();
-				Double TSR = 0.0;
-				Double STR = 0.0;
-				if(arrayListIndexByName(squadraHome,stats)!=-1){
-					if (tiriHome != 0 && tiriAway != 0) {
-						TSR = stats.get(arrayListIndexByName(squadraHome,stats)).getTSR() + (double) (tiriHome / tiriHome + tiriAway);
-				
-					} else {
-						TSR = stats.get(arrayListIndexByName(squadraHome,stats)).getTSR();
-					}
-					s.setTSR(TSR);
-				}
-				else{
-					if (tiriHome != 0 && tiriAway != 0) {
-						TSR = (double) (tiriHome / tiriHome + tiriAway);
-				
-					} else {
-						TSR = 0.0;
-					}
-					s.setNomeSquadra(squadraHome);
-					s.setTSR(TSR);
-					stats.add(s);
-				}
-				if(arrayListIndexByName(squadraHome,stats)!=-1){
-					if (partita.getJSONObject("home").getInt("shots_on_goal") != 0
-							&& partita.getJSONObject("away").getInt("shots_on_goal") != 0) {
-						STR = stats.get(arrayListIndexByName(squadraHome,stats)).getSTR()
-								+ (double) partita.getJSONObject("home").getInt("shots_on_goal")
-										/ (partita.getJSONObject("home").getInt("shots_on_goal")
-												+ partita.getJSONObject("away").getInt("shots_on_goal"));
-					} else {
-						STR = stats.get(arrayListIndexByName(squadraHome,stats)).getSTR();
-					}
-					s.setSTR(STR);
-				}
-				else{
-					if (partita.getJSONObject("home").getInt("shots_on_goal") != 0
-							&& partita.getJSONObject("away").getInt("shots_on_goal") != 0) {
-						STR = (double) partita.getJSONObject("home").getInt("shots_on_goal")
-						/ (partita.getJSONObject("home").getInt("shots_on_goal")
-								+ partita.getJSONObject("away").getInt("shots_on_goal"));
-				
-					} else {
-						STR = 0.0;
-					}
-					s.setNomeSquadra(squadraHome);
-					s.setSTR(STR);
-					stats.add(s);
-				}
-
-				/**/
-				
-				if(arrayListIndexByName(squadraAway,stats)!=-1){
-					if (tiriHome != 0 && tiriAway != 0) {
-						TSR = stats.get(arrayListIndexByName(squadraAway,stats)).getTSR() + (double) (tiriAway / tiriHome + tiriAway);
-				
-					} else {
-						TSR = stats.get(arrayListIndexByName(squadraAway,stats)).getTSR();
-					}
-					s2.setTSR(TSR);
-				}
-				else{
-					if (tiriHome != 0 && tiriAway != 0) {
-						TSR = (double) (tiriAway / tiriHome + tiriAway);
-				
-					} else {
-						TSR = 0.0;
-					}
-					s2.setNomeSquadra(squadraAway);
-					s2.setTSR(TSR);
-					stats.add(s2);
-				}
-				if(arrayListIndexByName(squadraAway,stats)!=-1){
-					if (partita.getJSONObject("away").getInt("shots_on_goal") != 0
-							&& partita.getJSONObject("home").getInt("shots_on_goal") != 0) {
-						STR = stats.get(arrayListIndexByName(squadraAway,stats)).getSTR()
-								+ (double) partita.getJSONObject("away").getInt("shots_on_goal")
-										/ (partita.getJSONObject("home").getInt("shots_on_goal")
-												+ partita.getJSONObject("away").getInt("shots_on_goal"));
-					} else {
-						STR = stats.get(arrayListIndexByName(squadraAway,stats)).getSTR();
-					}
-					s2.setSTR(STR);
-				}
-				else{
-					if (partita.getJSONObject("home").getInt("shots_on_goal") != 0
-							&& partita.getJSONObject("away").getInt("shots_on_goal") != 0) {
-						STR = (double) partita.getJSONObject("away").getInt("shots_on_goal")
-						/ (partita.getJSONObject("home").getInt("shots_on_goal")
-								+ partita.getJSONObject("away").getInt("shots_on_goal"));
-				
-					} else {
-						STR = 0.0;
-					}
-					s2.setNomeSquadra(squadraHome);
-					s2.setSTR(STR);
-					stats.add(s2);
+		JSONObject risultatiGiornata = Unirest
+				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-" + (giornata+1)
+						+ "/matches")
+				.asJson().getBody().getObject().getJSONObject("data");
+		JSONArray classifica = Unirest
+				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/standings").asJson().getBody()
+				.getObject().getJSONObject("data").getJSONArray("standings");
+		JSONArray results = risultatiGiornata.getJSONArray("matches");
+		logger.info("Dimensione array matches: "+results.length());
+		Statistica st = new Statistica();
+		List<double[][]> probabilita = new ArrayList<double[][]>();
+		for(int i=0;i<results.length();i++){
+			logger.info("dentro for matches");
+			String homeTeam = results.getJSONObject(i).getJSONObject("home").getString("team");
+			for(int j=0;j<classifica.length();j++){
+				String squadra = classifica.getJSONObject(j).getString("team");
+				if(homeTeam.equals(squadra)){
+					logger.info("squadra home: "+homeTeam+" squadra classifica: "+squadra);
+					st.setNomeCasa(homeTeam);
+					st.setPartiteGiocateCasa(classifica.getJSONObject(j).getJSONObject("home").getInt("matches_played"));
+					st.setGoalFattiCasa(classifica.getJSONObject(j).getJSONObject("home").getInt("scores"));
+					st.setGoalSubitiCasa(classifica.getJSONObject(j).getJSONObject("home").getInt("conceded"));
 				}
 			}
+			String awayTeam = results.getJSONObject(i).getJSONObject("away").getString("team");
+			for(int j=0;j<classifica.length();j++){
+				String squadra = classifica.getJSONObject(j).getString("team");
+				if(awayTeam.equals(squadra)){
+					logger.info("squadra away: "+homeTeam+" squadra classifica: "+squadra);
+					st.setNomeTrasferta(awayTeam);
+					st.setPartiteGiocateTrasferta(classifica.getJSONObject(j).getJSONObject("away").getInt("matches_played"));
+					st.setGoalFattiTrasferta(classifica.getJSONObject(j).getJSONObject("away").getInt("scores"));
+					st.setGoalSubitiTrasferta(classifica.getJSONObject(j).getJSONObject("away").getInt("conceded"));
+				}
+			}
+			
+			double A = (st.getGoalFattiCasa()/st.getPartiteGiocateCasa() + st.getGoalSubitiTrasferta()/st.getPartiteGiocateTrasferta()) /2;
+			logger.info("A: "+A);
+			double B = (st.getGoalSubitiCasa()/st.getPartiteGiocateCasa() + st.getGoalFattiTrasferta()/st.getPartiteGiocateTrasferta())/2;
+			logger.info("B: "+B);
+			final double EULERO = 2.71828183;
+			final double[] FACTORIAL = {1,1,2,6,24,120,720}; 
+			double[] formulaHome = new double[7];
+			double[] formulaAway = new double[7];
+			for(int j=0;j<7;j++){
+				formulaHome[j] = (Math.pow(A, j)*Math.pow(EULERO, -A))/FACTORIAL[j];
+				formulaAway[j] = (Math.pow(B, j)*Math.pow(EULERO, -B))/FACTORIAL[j];
+				logger.info("Formula Home: "+formulaHome[j]+" Formula Away: "+formulaAway[j]);
+			}
+			double[][] risultatiProbabili = new double[7][7];
+			for(int x=0;x<7;x++){
+				for(int y=0;y<7;y++){
+					risultatiProbabili[x][y] = formulaHome[x]*formulaAway[y]*100;
+					logger.info(risultatiProbabili[x][y]);
+				}
+			}
+			probabilita.add(risultatiProbabili);
 		}
-		for(Statistica st : stats){
-			st.setSTR(st.getSTR()/giornata);
-			st.setTSR(st.getTSR()/giornata);
-			st.setMedia();
-		}
-		
-		Collections.sort(stats, new Comparator<Statistica>() {
-		    @Override
-		    public int compare(Statistica o1, Statistica o2) {
-		        if(o1.getMedia()>o2.getMedia()){
-		        	return -1;
-		        }
-		        else if(o1.getMedia()<o2.getMedia()){
-		        	return 1;
-		        }
-		        else{
-		        	return 0;
-		        }
-		    }
-		});
-		model.addAttribute("stats", stats);
+		model.addAttribute("stats",probabilita);
 		return "pronostici";
-	}
-	
-	public static int arrayListIndexByName(String name,List<Statistica> array){
-		for(int i=0;i<array.size();i++){
-			if(name.equals(array.get(i).getNomeSquadra())){
-				return i;
-			}
-		}
-		return -1;
 	}
 }
