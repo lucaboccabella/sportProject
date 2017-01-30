@@ -19,6 +19,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sportProject.model.Position;
 import com.sportProject.model.Risultati;
+import com.sportProject.model.Statistica;
 
 @Controller
 public class mainController {
@@ -86,29 +87,59 @@ public class mainController {
 		/*
 		RECUPERO STATISTICHE E LI SALVO IN UNA MAPPA CON CHIAVE IL NOME E VALORI LA LISTA DI STATISTICHE 
 		*/
-        Map<String,ArrayList<Integer>> stats = new HashMap<String,ArrayList<Integer>>();
+        Map<String,Statistica> stats = new HashMap<String,Statistica>();
+        giornata = Unirest.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/standings")
+				.asJson().getBody().getObject().getJSONObject("data").getJSONArray("standings").getJSONObject(10).getJSONObject("overall").getInt("matches_played");;
         for(int i=0;i<=giornata;i++){
         	JSONObject response = Unirest.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-"+giornata+"/matches")
 				.asJson().getBody().getObject().getJSONObject("data");
         	JSONArray partite = response.getJSONArray("matches");
+    		List<String> squadre = new ArrayList<String>();
         	for(int j=0;j<partite.length();j++){
         		JSONObject partita = partite.getJSONObject(j);
-        		int tiriHomeFatti = partita.getJSONObject("home").getInt("shots_on_goal") + partita.getJSONObject("home").getInt("shots_off_goal");
-        		int tiriAwayFatti = partita.getJSONObject("away").getInt("shots_on_goal") + partita.getJSONObject("away").getInt("shots_off_goal");
-        		Integer TSR;
+        		double tiriHomeFatti = partita.getJSONObject("home").getInt("shots_on_goal") + partita.getJSONObject("home").getInt("shots_off_goal");
+        		double tiriAwayFatti = partita.getJSONObject("away").getInt("shots_on_goal") + partita.getJSONObject("away").getInt("shots_off_goal");
+        		Double TSR = 0.0;
+        		Double STR = 0.0;
+        		Statistica stat = new Statistica();
         		String squadraHome = partita.getJSONObject("home").getString("team");
+        		squadre.add(squadraHome);
         		String squadraAway = partita.getJSONObject("away").getString("team");
-        		ArrayList<Integer> arrayStats = new ArrayList<Integer>();
-        		TSR = tiriHomeFatti/(tiriHomeFatti+tiriAwayFatti);
-        		arrayStats.add(TSR);
-        		stats.put(squadraHome, arrayStats);
-        		logger.info("Casa: "+squadraHome+" stats: "+arrayStats);
-        		arrayStats.clear();
-        		TSR = tiriAwayFatti/(tiriAwayFatti+tiriHomeFatti);
-        		arrayStats.add(TSR);
-        		stats.put(squadraAway, arrayStats);
-        		logger.info("Ospiti: "+squadraAway+" stats: "+arrayStats);
-        		arrayStats.clear();
+        		squadre.add(squadraAway);
+        		if(stats.get(squadraHome) != null && !(stats.get(squadraHome).getTSR().isNaN()) && !(stats.get(squadraHome).getTSR().isInfinite()) && !(stats.get(squadraHome).getSTR().isNaN()) && !(stats.get(squadraHome).getSTR().isInfinite())){
+        			TSR += stats.get(squadraHome).getTSR()+tiriHomeFatti/(tiriHomeFatti+tiriAwayFatti);
+        			STR += stats.get(squadraHome).getSTR()+(double) partita.getJSONObject("home").getInt("shots_on_goal") / (partita.getJSONObject("home").getInt("shots_on_goal") + partita.getJSONObject("away").getInt("shots_on_goal"));
+        		}
+        		else{
+        			TSR = tiriHomeFatti/(tiriHomeFatti+tiriAwayFatti);
+        			STR = (double) partita.getJSONObject("home").getInt("shots_on_goal") / (partita.getJSONObject("home").getInt("shots_on_goal") + partita.getJSONObject("away").getInt("shots_on_goal"));
+        		}
+    			stat.setTSR(TSR);
+        		stat.setSTR(STR);
+        		stat.setMedia();
+        		logger.info("TSR: "+TSR);
+        		logger.info("STR: "+STR);
+        		stats.put(squadraHome, stat);
+        		if(stats.get(squadraAway) != null && !(stats.get(squadraAway).getTSR().isNaN()) && !(stats.get(squadraAway).getTSR().isInfinite()) && !(stats.get(squadraAway).getSTR().isNaN()) && !(stats.get(squadraAway).getSTR().isInfinite())){
+        			TSR += stats.get(squadraAway).getTSR() + tiriAwayFatti/(tiriAwayFatti+tiriHomeFatti);
+        			STR += stats.get(squadraAway).getSTR()+(double) partita.getJSONObject("away").getInt("shots_on_goal") / (partita.getJSONObject("away").getInt("shots_on_goal") + partita.getJSONObject("home").getInt("shots_on_goal"));
+        		}
+        		else{
+        			TSR = tiriAwayFatti/(tiriAwayFatti+tiriHomeFatti);
+        			STR = (double) partita.getJSONObject("away").getInt("shots_on_goal") / (partita.getJSONObject("away").getInt("shots_on_goal") + partita.getJSONObject("home").getInt("shots_on_goal"));
+        		}
+        		stat.setTSR(TSR);
+        		stat.setSTR(STR);
+        		stat.setMedia();
+        		logger.info("TSR: "+TSR);
+        		logger.info("STR: "+STR);
+        		stats.put(squadraAway, stat);
+        	}
+        	for(String s:squadre){
+        		Statistica st = new Statistica();
+        		st.setMedia(stats.get(s).getMedia()/i);
+        		stats.remove(s);
+        		stats.put(s, st);
         	}
         }
         model.addAttribute("stats",stats);
