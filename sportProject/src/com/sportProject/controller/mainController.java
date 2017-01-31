@@ -97,46 +97,44 @@ public class mainController {
 		/*
 		 * RECUPERO STATISTICHE 
 		 */
+		JSONArray classifica = Unirest
+				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/standings").asJson().getBody()
+				.getObject().getJSONObject("data").getJSONArray("standings");
+		giornata = classifica.getJSONObject(10).getJSONObject("overall").getInt("matches_played");
 		JSONObject risultatiGiornata = Unirest
 				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-" + (giornata+1)
 						+ "/matches")
 				.asJson().getBody().getObject().getJSONObject("data");
-		JSONArray classifica = Unirest
-				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/standings").asJson().getBody()
-				.getObject().getJSONObject("data").getJSONArray("standings");
 		JSONArray results = risultatiGiornata.getJSONArray("matches");
-		logger.info("Dimensione array matches: "+results.length());
-		Statistica st = new Statistica();
-		List<double[][]> probabilita = new ArrayList<double[][]>();
+		HashMap<String,Statistica> probabile = new HashMap<String,Statistica>();
 		for(int i=0;i<results.length();i++){
-			logger.info("dentro for matches");
+			Statistica st = new Statistica();
+			double A = 0.0;
+			double B = 0.0;
 			String homeTeam = results.getJSONObject(i).getJSONObject("home").getString("team");
 			for(int j=0;j<classifica.length();j++){
 				String squadra = classifica.getJSONObject(j).getString("team");
 				if(homeTeam.equals(squadra)){
-					logger.info("squadra home: "+homeTeam+" squadra classifica: "+squadra);
 					st.setNomeCasa(homeTeam);
 					st.setPartiteGiocateCasa(classifica.getJSONObject(j).getJSONObject("home").getInt("matches_played"));
 					st.setGoalFattiCasa(classifica.getJSONObject(j).getJSONObject("home").getInt("scores"));
-					st.setGoalSubitiCasa(classifica.getJSONObject(j).getJSONObject("home").getInt("conceded"));
+					st.setGoalSubitiCasa(classifica.getJSONObject(j).getJSONObject("home").getInt("conceded"));	
 				}
 			}
 			String awayTeam = results.getJSONObject(i).getJSONObject("away").getString("team");
 			for(int j=0;j<classifica.length();j++){
 				String squadra = classifica.getJSONObject(j).getString("team");
 				if(awayTeam.equals(squadra)){
-					logger.info("squadra away: "+homeTeam+" squadra classifica: "+squadra);
 					st.setNomeTrasferta(awayTeam);
 					st.setPartiteGiocateTrasferta(classifica.getJSONObject(j).getJSONObject("away").getInt("matches_played"));
 					st.setGoalFattiTrasferta(classifica.getJSONObject(j).getJSONObject("away").getInt("scores"));
 					st.setGoalSubitiTrasferta(classifica.getJSONObject(j).getJSONObject("away").getInt("conceded"));
+					B = ((double) st.getGoalSubitiCasa()/(double) st.getPartiteGiocateCasa() + (double) st.getGoalFattiTrasferta()/(double) st.getPartiteGiocateTrasferta())/2;
+					A = ((double) st.getGoalFattiCasa()/(double) st.getPartiteGiocateCasa() + (double) st.getGoalSubitiTrasferta()/(double) st.getPartiteGiocateTrasferta()) /2;
 				}
 			}
 			
-			double A = (st.getGoalFattiCasa()/st.getPartiteGiocateCasa() + st.getGoalSubitiTrasferta()/st.getPartiteGiocateTrasferta()) /2;
-			logger.info("A: "+A);
-			double B = (st.getGoalSubitiCasa()/st.getPartiteGiocateCasa() + st.getGoalFattiTrasferta()/st.getPartiteGiocateTrasferta())/2;
-			logger.info("B: "+B);
+			
 			final double EULERO = 2.71828183;
 			final double[] FACTORIAL = {1,1,2,6,24,120,720}; 
 			double[] formulaHome = new double[7];
@@ -144,18 +142,55 @@ public class mainController {
 			for(int j=0;j<7;j++){
 				formulaHome[j] = (Math.pow(A, j)*Math.pow(EULERO, -A))/FACTORIAL[j];
 				formulaAway[j] = (Math.pow(B, j)*Math.pow(EULERO, -B))/FACTORIAL[j];
-				logger.info("Formula Home: "+formulaHome[j]+" Formula Away: "+formulaAway[j]);
 			}
 			double[][] risultatiProbabili = new double[7][7];
+			double maxProb = 0;
+			String pos = "0-0";
 			for(int x=0;x<7;x++){
 				for(int y=0;y<7;y++){
 					risultatiProbabili[x][y] = formulaHome[x]*formulaAway[y]*100;
-					logger.info(risultatiProbabili[x][y]);
+					if(risultatiProbabili[x][y] > maxProb){
+						maxProb=risultatiProbabili[x][y];
+						pos = x+"-"+y;
+					}
 				}
 			}
-			probabilita.add(risultatiProbabili);
+			st.setRisultatoProbabile(pos);
+			double uno = 0.0;
+			for(int risCasa=1;risCasa<7;risCasa++){
+				for(int risTrasferta=0;risTrasferta<risCasa;risTrasferta++){
+					uno += risultatiProbabili[risCasa][risTrasferta];
+				}
+			}
+			st.setUno(Math.round(uno));
+			
+			double due = 0.0;
+			for(int risTrasferta=1;risTrasferta<7;risTrasferta++){
+				for(int risCasa=0;risCasa<risTrasferta;risCasa++){
+					due += risultatiProbabili[risCasa][risTrasferta];
+				}
+			}
+			st.setDue(Math.round(due));
+			st.setPareggio(Math.floor(100-(uno+due)));
+			
+			
+			double under = 0.0;
+			double over = 0.0;
+			for(int risCasa=0;risCasa<7;risCasa++){
+				for(int risTrasferta=0;risTrasferta<7;risTrasferta++){
+					if(risCasa+risTrasferta>2){
+						under += risultatiProbabili[risCasa][risTrasferta];
+					}
+					else{
+						over += risultatiProbabili[risCasa][risTrasferta];
+					}
+				}
+			}
+			st.setOver(Math.round(over));
+			st.setUnder(Math.round(under));
+			probabile.put(homeTeam+"-"+awayTeam, st);
 		}
-		model.addAttribute("stats",probabilita);
+		model.addAttribute("stats",probabile);
 		return "pronostici";
 	}
 }

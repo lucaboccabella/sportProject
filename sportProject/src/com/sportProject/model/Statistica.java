@@ -9,6 +9,12 @@ public class Statistica {
 	private int partiteGiocateTrasferta;
 	private String nomeCasa;
 	private String nomeTrasferta;
+	private String risultatoProbabile;
+	private double uno;
+	private double pareggio;
+	private double due;
+	private double under;
+	private double over;
 	
 	public Statistica() {
 	}
@@ -76,5 +82,55 @@ public class Statistica {
 	public void setNomeTrasferta(String nomeTrasferta) {
 		this.nomeTrasferta = nomeTrasferta;
 	}
+
+	public String getRisultatoProbabile() {
+		return risultatoProbabile;
+	}
+
+	public void setRisultatoProbabile(String risultatoProbabile) {
+		this.risultatoProbabile = risultatoProbabile;
+	}
+
+	public double getUno() {
+		return uno;
+	}
+
+	public void setUno(double uno) {
+		this.uno = uno;
+	}
+
+	public double getPareggio() {
+		return pareggio;
+	}
+
+	public void setPareggio(double pareggio) {
+		this.pareggio = pareggio;
+	}
+
+	public double getDue() {
+		return due;
+	}
+
+	public void setDue(double due) {
+		this.due = due;
+	}
+
+	public double getUnder() {
+		return under;
+	}
+
+	public void setUnder(double under) {
+		this.under = under;
+	}
+
+	public double getOver() {
+		return over;
+	}
+
+	public void setOver(double over) {
+		this.over = over;
+	}
+
+	
 	
 }
