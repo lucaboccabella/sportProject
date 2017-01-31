@@ -12,7 +12,7 @@
 </head>
 <body>
 	<div class="container-fluid">
-		<div class="col col-md-5">
+		<div class="col col-md-7">
 			<table class="table table-striped table-bordered">
 				<tr>
 					<th>Squadra</th>
@@ -22,6 +22,8 @@
 					<th class="text-center">2</th>
 					<th>Over 2,5</th>
 					<th>Under 2,5</th>
+					<th>Goal</th>
+					<th>NoGoal</th>
 				</tr>
 				<c:forEach var="risultati" items="${stats}">
 					<tr>
@@ -32,6 +34,8 @@
 						<td>${risultati.value.due}%</td>
 						<td>${risultati.value.over}%</td>
 						<td>${risultati.value.under}%</td>
+						<td>${risultati.value.goal}%</td>
+						<td>${risultati.value.nogoal}%</td>
 					</tr>
 				</c:forEach>
 			</table>

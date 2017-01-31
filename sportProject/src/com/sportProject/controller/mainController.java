@@ -179,15 +179,24 @@ public class mainController {
 			for(int risCasa=0;risCasa<7;risCasa++){
 				for(int risTrasferta=0;risTrasferta<7;risTrasferta++){
 					if(risCasa+risTrasferta>2){
-						under += risultatiProbabili[risCasa][risTrasferta];
+						over += risultatiProbabili[risCasa][risTrasferta];
 					}
 					else{
-						over += risultatiProbabili[risCasa][risTrasferta];
+						under += risultatiProbabili[risCasa][risTrasferta];
 					}
 				}
 			}
 			st.setOver(Math.round(over));
 			st.setUnder(Math.round(under));
+			
+			double goal = 0.0;
+			for(int risCasa=1;risCasa<7;risCasa++){
+				for(int risTrasferta=1;risTrasferta<7;risTrasferta++){
+					goal += risultatiProbabili[risCasa][risTrasferta];
+				}
+			}
+			st.setGoal(Math.round(goal));
+			st.setNogoal(Math.round(100-goal));
 			probabile.put(homeTeam+"-"+awayTeam, st);
 		}
 		model.addAttribute("stats",probabile);

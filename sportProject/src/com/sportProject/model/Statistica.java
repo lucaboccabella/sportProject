@@ -15,6 +15,8 @@ public class Statistica {
 	private double due;
 	private double under;
 	private double over;
+	private double goal;
+	private double nogoal;
 	
 	public Statistica() {
 	}
@@ -129,6 +131,22 @@ public class Statistica {
 
 	public void setOver(double over) {
 		this.over = over;
+	}
+
+	public double getGoal() {
+		return goal;
+	}
+
+	public void setGoal(double goal) {
+		this.goal = goal;
+	}
+
+	public double getNogoal() {
+		return nogoal;
+	}
+
+	public void setNogoal(double nogoal) {
+		this.nogoal = nogoal;
 	}
 
 	
