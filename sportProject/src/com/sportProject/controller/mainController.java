@@ -27,6 +27,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sportProject.model.Position;
 import com.sportProject.model.Risultati;
 import com.sportProject.model.Statistica;
+import com.sportProject.model.StatisticaClassifica;
 
 @Controller
 public class mainController {
@@ -200,6 +201,87 @@ public class mainController {
 			probabile.put(homeTeam+"-"+awayTeam, st);
 		}
 		model.addAttribute("stats",probabile);
+		
+		/*STATISTICHE CLASSIFICA*/
+		HashMap<String,StatisticaClassifica> previsioneClassifica = new HashMap<String,StatisticaClassifica>();
+		for(int i=0;i<classifica.length();i++){
+			double tiriFatti = 0.0;
+			double tiriSubiti = 0.0;
+			double tiriPortaFatti = 0.0;
+			double tiriPortaSubiti = 0.0;
+			
+			for(int j=giornata-5;j<=giornata;j++){
+				JSONArray matches = Unirest
+				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-" + j
+						+ "/matches")
+				.asJson().getBody().getObject().getJSONObject("data").getJSONArray("matches");
+				for(int k=0;k<matches.length();k++){
+					if(classifica.getJSONObject(i).getString("team").equals(matches.getJSONObject(k).getJSONObject("home").getString("team"))){
+						tiriFatti += matches.getJSONObject(k).getJSONObject("home").getInt("shots_on_goal")+matches.getJSONObject(k).getJSONObject("home").getInt("shots_off_goal");
+						tiriPortaFatti += matches.getJSONObject(k).getJSONObject("home").getInt("shots_on_goal");
+						tiriSubiti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal")+matches.getJSONObject(k).getJSONObject("away").getInt("shots_off_goal");
+						tiriPortaSubiti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal");
+					}
+					else if(classifica.getJSONObject(i).getString("team").equals(matches.getJSONObject(k).getJSONObject("away").getString("team"))){
+						tiriFatti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal")+matches.getJSONObject(k).getJSONObject("away").getInt("shots_off_goal");
+						tiriPortaFatti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal");
+						tiriSubiti += matches.getJSONObject(k).getJSONObject("home").getInt("shots_on_goal")+matches.getJSONObject(k).getJSONObject("home").getInt("shots_off_goal");
+						tiriPortaSubiti += matches.getJSONObject(k).getJSONObject("home").getInt("shots_on_goal");
+					}
+				}
+			}
+			StatisticaClassifica stc = new StatisticaClassifica();
+			stc.setNomeSquadra(classifica.getJSONObject(i).getString("team"));
+			stc.setTiriFatti(tiriFatti);
+			stc.setTiriSubiti(tiriSubiti);
+			stc.setTiriInPortaFatti(tiriPortaFatti);
+			stc.setTiriInPortaSubiti(tiriPortaSubiti);
+			stc.setTSR(tiriFatti/(tiriFatti+tiriSubiti));
+			stc.setSTR(tiriPortaFatti/(tiriPortaFatti+tiriPortaSubiti));
+			stc.setMedia((tiriFatti/(tiriFatti+tiriSubiti))+(tiriPortaFatti/(tiriPortaFatti+tiriPortaSubiti))/2);
+			stc.setStato();
+			previsioneClassifica.put(classifica.getJSONObject(i).getString("team"), stc);
+		}
+		model.addAttribute("classificaPrevista",sortMapByValues(previsioneClassifica));
 		return "pronostici";
 	}
+	
+	private static Map<String, StatisticaClassifica> sortMapByValues(Map<String, StatisticaClassifica> aMap) {
+        
+        Set<Entry<String,StatisticaClassifica>> mapEntries = aMap.entrySet();
+        
+        logger.info("Values and Keys before sorting ");
+        for(Entry<String,StatisticaClassifica> entry : mapEntries) {
+            logger.info(entry.getValue().getMedia() + " - "+ entry.getKey());
+        }
+        
+        // used linked list to sort, because insertion of elements in linked list is faster than an array list. 
+        List<Entry<String,StatisticaClassifica>> aList = new LinkedList<Entry<String,StatisticaClassifica>>(mapEntries);
+
+        // sorting the List
+        Collections.sort(aList, new Comparator<Entry<String,StatisticaClassifica>>() {
+
+            @Override
+            public int compare(Entry<String, StatisticaClassifica> ele1,
+                    Entry<String, StatisticaClassifica> ele2) {
+                if(ele1.getValue().getMedia()>ele2.getValue().getMedia()){
+                	return -1;
+                }
+                else if(ele1.getValue().getMedia()<ele2.getValue().getMedia()){
+                	return 1;
+                }
+                else{
+                	return 0;
+                }
+            }
+        });
+        
+        // Storing the list into Linked HashMap to preserve the order of insertion. 
+        Map<String,StatisticaClassifica> aMap2 = new LinkedHashMap<String, StatisticaClassifica>();
+        for(Entry<String,StatisticaClassifica> entry: aList) {
+            aMap2.put(entry.getKey(), entry.getValue());
+        }
+        return aMap2;
+	}
+	
 }
