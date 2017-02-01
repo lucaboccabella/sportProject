@@ -5,7 +5,7 @@
 <%@include file="head.jsp" %>
 <body>
 	<%@include file="header.jsp" %>
-	<div class="container-fluid">
+	<div id="content" class="container notBarre">
 		<div class="col col-md-2" id="classifica">
 			<table class="table table-bordered">
 				<tr>

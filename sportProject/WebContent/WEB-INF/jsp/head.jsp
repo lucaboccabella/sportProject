@@ -11,6 +11,12 @@
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <style>
+	body{
+		background-color: #bbb;
+	}
+	.notBarre{
+		background-color: #fff;
+	}
 	.stemmi{
 		width: 30px;
 		margin-right: 2%;
@@ -23,6 +29,13 @@
 	#copyright{
 		padding: 1%;
     	margin-bottom: 0;
+	}
+	
+	#nav{
+		margin-bottom: 0;
+	}
+	#content{
+		padding-top: 2%;
 	}
 </style>
 </head>

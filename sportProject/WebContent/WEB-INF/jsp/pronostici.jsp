@@ -3,15 +3,15 @@
 <%@include file="head.jsp"%>
 <body>
 	<%@include file="header.jsp" %>
-	<div class="container-fluid">
+	<div id="content" class="container notBarre">
 		<div class="col col-md-2">
 			<img
-				src="https://placeholdit.imgix.net/~text?txtsize=38&txt=220%C3%971800&w=220&h=1800" />
+				src="https://placeholdit.imgix.net/~text?txtsize=38&txt=160%C3%971700&w=160&h=1700" />
 		</div>
 		<div class="col col-md-8">
 			<h2 class="title">I Nostri Pronostici</h2>
 			<br /> <img
-				src="https://placeholdit.imgix.net/~text?txtsize=38&txt=940%C3%97200&w=940&h=200" />
+				src="https://placeholdit.imgix.net/~text?txtsize=38&txt=700%C3%97200&w=700&h=200" />
 			<br /> <br />
 			<div class="col col-md-12 col-xs-12 col-sm-12">
 				<table class="table table-striped table-bordered">
@@ -60,7 +60,7 @@
 		</div>
 		<div class="col col-md-2">
 			<img
-				src="https://placeholdit.imgix.net/~text?txtsize=38&txt=240%C3%971800&w=240&h=1800" />
+				src="https://placeholdit.imgix.net/~text?txtsize=38&txt=160%C3%971700&w=160&h=1700" />
 		</div>
 	</div>
 	<%@include file="footer.jsp" %>
