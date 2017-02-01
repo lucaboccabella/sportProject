@@ -12,13 +12,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -94,7 +98,7 @@ public class mainController {
 	}
 
 	@RequestMapping(value = "/pronostici")
-	public String pronostici(Model model) throws UnirestException {
+	public String pronostici(Model model,HttpSession session) throws Exception {
 		/*
 		 * RECUPERO STATISTICHE 
 		 */
@@ -203,7 +207,11 @@ public class mainController {
 		model.addAttribute("stats",probabile);
 		
 		/*STATISTICHE CLASSIFICA*/
+		
+		
 		HashMap<String,StatisticaClassifica> previsioneClassifica = new HashMap<String,StatisticaClassifica>();
+		HashMap<String,StatisticaClassifica> inSession = (HashMap<String, StatisticaClassifica>) session.getAttribute("classificaInSession");
+		if(inSession==null){
 		for(int i=0;i<classifica.length();i++){
 			double tiriFatti = 0.0;
 			double tiriSubiti = 0.0;
@@ -221,12 +229,14 @@ public class mainController {
 						tiriPortaFatti += matches.getJSONObject(k).getJSONObject("home").getInt("shots_on_goal");
 						tiriSubiti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal")+matches.getJSONObject(k).getJSONObject("away").getInt("shots_off_goal");
 						tiriPortaSubiti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal");
+						break;
 					}
 					else if(classifica.getJSONObject(i).getString("team").equals(matches.getJSONObject(k).getJSONObject("away").getString("team"))){
 						tiriFatti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal")+matches.getJSONObject(k).getJSONObject("away").getInt("shots_off_goal");
 						tiriPortaFatti += matches.getJSONObject(k).getJSONObject("away").getInt("shots_on_goal");
 						tiriSubiti += matches.getJSONObject(k).getJSONObject("home").getInt("shots_on_goal")+matches.getJSONObject(k).getJSONObject("home").getInt("shots_off_goal");
 						tiriPortaSubiti += matches.getJSONObject(k).getJSONObject("home").getInt("shots_on_goal");
+						break;
 					}
 				}
 			}
@@ -242,7 +252,12 @@ public class mainController {
 			stc.setStato();
 			previsioneClassifica.put(classifica.getJSONObject(i).getString("team"), stc);
 		}
+		session.setAttribute("classificaInSession",sortMapByValues(previsioneClassifica));
 		model.addAttribute("classificaPrevista",sortMapByValues(previsioneClassifica));
+		}
+		else{
+			model.addAttribute("classificaPrevista",session.getAttribute("classificaInSession"));
+		}
 		return "pronostici";
 	}
 	
@@ -283,5 +298,5 @@ public class mainController {
         }
         return aMap2;
 	}
-	
+		
 }

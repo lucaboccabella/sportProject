@@ -48,7 +48,7 @@
 			<table class="table table-striped table-bordered">
 				<tr>
 					<th>Stato di forma</th>
-					<th>Punteggio statistico</th>
+					<th class="text-center">Punteggio statistico</th>
 				</tr>
 				<c:forEach var="squadra" items="${classificaPrevista}">
 					<tr class="${squadra.value.stato}">
