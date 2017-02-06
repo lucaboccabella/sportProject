@@ -320,7 +320,8 @@ public class mainController {
 				.getObject().getJSONObject("data").getJSONArray("topscorers");
 		
 		ArrayList<Marcatore> marcatori = new ArrayList<Marcatore>();
-
+		
+		ArrayList<String> nomiTrovati = new ArrayList<String>();
 		
 		for(int i = 0; i < classificaMarcatori.length(); i++) {
 			
@@ -329,9 +330,18 @@ public class mainController {
 			m.setNomeSquadra(classificaMarcatori.getJSONObject(i).getString("team"));
 			m.setGoal(classificaMarcatori.getJSONObject(i).getInt("goals"));
 			m.setRigori(classificaMarcatori.getJSONObject(i).getInt("penalties"));
-
-			marcatori.add(m);
-
+			
+			boolean sw = false;
+			for(String s:nomiTrovati){
+				if(classificaMarcatori.getJSONObject(i).getString("fullname").equals(s)){
+					sw = true;
+					break;
+				}
+			}
+			if(sw == false){
+				marcatori.add(m);
+				nomiTrovati.add(m.getNomeMarcatore());
+			}
 		}
 		
 		
