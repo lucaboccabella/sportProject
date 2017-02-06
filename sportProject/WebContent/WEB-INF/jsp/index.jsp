@@ -6,7 +6,7 @@
 <body>
 	<%@include file="header.jsp" %>
 	<div id="content" class="container notBarre">
-		<div class="col col-md-2" id="classifica">
+		<div class="col col-md-3" id="classifica">
 			<table class="table table-bordered">
 				<tr>
 					<th>Nome</th>
@@ -14,13 +14,13 @@
 				</tr>
 				<c:forEach var="squadra" items="${classifica}">
 					<tr class="${squadra.situazionePunti}">
-						<td>${squadra.nome}</td>
+						<td><img class="stemmi" src="http://soccer.sportsopendata.net/logos/italy/<c:url value="${fn:toLowerCase(squadra.nome)}"/>.png"/>${squadra.nome}</td>
 						<td class="text-center">${squadra.punti}</td>
 					</tr>
 				</c:forEach>
 			</table>
 		</div>
-		<div class="col col-md-7">
+		<div class="col col-md-6">
 			<h1 class="lead text-center">Ultima giornata</h1>
 			<table class="table table-bordered col col-md-12">
 				<c:forEach var="risultato" items="${risultati}">
