@@ -25,6 +25,7 @@
 	#footer{
 		background-color: #333;
 		color: #fff;
+		box-shadow: 0 -6px 17px 0 rgba(0,0,0,.6), 0 -6px 20px 0 rgba(0,0,0,.19);
 	}
 	#copyright{
 		padding: 1%;
@@ -33,9 +34,15 @@
 	
 	#nav{
 		margin-bottom: 0;
+		box-shadow: 0 6px 17px 0 rgba(0,0,0,.6), 0 6px 20px 0 rgba(0,0,0,.19);
 	}
 	#content{
 		padding-top: 2%;
+		box-shadow: 0 6px 17px 0 rgba(0,0,0,.6), 0 6px 20px 0 rgba(0,0,0,.19);
+	}
+	#headbar{
+		background: #fff;
+		box-shadow: inset 0px -8px 12px rgba(0,0,0,.3);
 	}
 </style>
 </head>

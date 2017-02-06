@@ -260,6 +260,16 @@ public class mainController {
 		}
 		return "pronostici";
 	}
+
+	@RequestMapping(value="/squadre")
+	public String squadre(Model model) throws UnirestException{
+		return "squadre";
+	}
+	
+	@RequestMapping(value="/giocatori")
+	public String giocatori(Model model) throws UnirestException{
+		return "giocatori";
+	}
 	
 	private static Map<String, StatisticaClassifica> sortMapByValues(Map<String, StatisticaClassifica> aMap) {
         
