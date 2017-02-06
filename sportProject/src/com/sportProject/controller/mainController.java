@@ -77,6 +77,7 @@ public class mainController {
 		 * RECUPERO RISULTATI ULTIMA GIORNATA(da integrare meglio scelta
 		 * giornata)
 		 */
+		
 		giornata = squadre.getJSONObject(10).getJSONObject("overall").getInt("matches_played");
 		JSONObject risultatiGiornata = Unirest
 				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/rounds/round-" + giornata
