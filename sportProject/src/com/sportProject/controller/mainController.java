@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.sportProject.model.Marcatore;
 import com.sportProject.model.Position;
 import com.sportProject.model.Risultati;
 import com.sportProject.model.Statistica;
@@ -309,5 +311,38 @@ public class mainController {
         }
         return aMap2;
 	}
+	
+	@RequestMapping(value = "/marcatori")
+	public String marcatori(Model model,HttpSession session) throws Exception {
+		
+		JSONArray classificaMarcatori = Unirest
+				.get("http://soccer.sportsopendata.net/v1/leagues/serie-a/seasons/16-17/topscorers").asJson().getBody()
+				.getObject().getJSONObject("data").getJSONArray("topscorers");
+		
+		ArrayList<Marcatore> marcatori = new ArrayList<Marcatore>();
+
+		
+		for(int i = 0; i < classificaMarcatori.length(); i++) {
+			
+			Marcatore m = new Marcatore();
+			m.setNomeMarcatore(classificaMarcatori.getJSONObject(i).getString("fullname"));
+			m.setNomeSquadra(classificaMarcatori.getJSONObject(i).getString("team"));
+			m.setGoal(classificaMarcatori.getJSONObject(i).getInt("goals"));
+			m.setRigori(classificaMarcatori.getJSONObject(i).getInt("penalties"));
+
+			marcatori.add(m);
+
+		}
+		
+		
+		
+		model.addAttribute("marcatori", marcatori);
+		
+		
+		
+		return "marcatori";
+	}
+
+	
 		
 }

@@ -16,7 +16,7 @@
 					data-toggle="dropdown" href="#">Classifiche <span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="squadre">Squadre</a></li>
-						<li><a href="giocatori">Giocatori</a></li>
+						<li><a href="marcatori">Marcatori</a></li>
 					</ul></li>
 				<li><a href="pronostici">Pronostici</a></li>
 				<li><a href="#">Page 3</a></li>
